@@ -47,6 +47,8 @@ Some datasets that can be used for this purpose are:
 - **lemmatization** (bool, optional): Whether to apply lemmatization to words. Default is True.
 - **words_to_replace** (dict, optional): A dictionary where keys are words to be replaced and values are the replacements. Default is an empty dictionary.
 - **label_text_font_size** (int, optional): Font size for the labels in the chord plot. Default is 12.
+- **min_pair_frequency** (int, optional): Minimum number of times that each pair should appear in the data to be included in the visualization. For example, `min_pair_frequency=5` will only draw edges for word‑pairs that appear together in at least five sentences. For smaller data sets, this threshold should not be very high or nothing will be displayed. For larger ones, it's better to increase it to reduce the amount of irrelevant data. Default is 100.
+
 
 ## Returns
 - **hv.Chord**: A chord plot visualization of word co-occurrence patterns and sentiment analysis.

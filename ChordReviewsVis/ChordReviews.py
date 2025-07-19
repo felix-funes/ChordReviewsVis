@@ -14,7 +14,7 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 import holoviews as hv
 from holoviews import opts, dim
 
-def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False, lemmatization=True, words_to_replace={}, label_text_font_size=12):
+def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False, lemmatization=True, words_to_replace={}, label_text_font_size=12, min_pair_frequency=100):
     """
     Process reviews data, apply text preprocessing, and generate a chord plot visualization showing word co-occurrence patterns and sentiment analysis.
 
@@ -27,6 +27,7 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
     lemmatization (bool, optional): Whether to apply lemmatization to words (default is True).
     words_to_replace (dict, optional): A dictionary where keys are words to be replaced and values are the replacements (default is {}).
     label_text_font_size (int, optional): Font size for the labels in the chord plot (default is 12).
+    min_pair_frequency (int, optional): Minimum number of co‑occurrences required for a word‑pair to appear in the chord plot. For example, `number_of_pairs=5` will only draw edges for word‑pairs that appear together in at least five sentences. For smaller data sets, this threshold should not be very high. For larger ones, it's better to increase it to reduce the amount of irrelevant data (default is 100).
 
     Returns:
     hv.Chord: Chord plot visualization.
@@ -166,7 +167,7 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
         sentences['FilteredText'] = sentences['WordsCleaned'].apply(filter_grammatical_words)
 
         # Function to count pairs of words at a certain distance
-        def count_word_pairs(df, column_name, n, threshold=1):
+        def count_word_pairs(df, column_name, n, threshold=min_pair_frequency):
             word_pairs_counter = Counter()
 
             for text in df[column_name]:
@@ -182,7 +183,7 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
             return sorted_word_pairs_counter
 
         # Get word pairs at a distance of 2 that are shown at least 100 times in reviews
-        word_pairs_at_distance = count_word_pairs(sentences, 'FilteredText', 2, 100)
+        word_pairs_at_distance = count_word_pairs(sentences, 'FilteredText', 2, min_pair_frequency)
 
         # Convert to DataFrame
         df_word_pairs = pd.DataFrame([{'source': pair[0], 'target': pair[1], 'weight': count} for pair, count in word_pairs_at_distance])
