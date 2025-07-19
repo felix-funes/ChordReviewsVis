@@ -11,7 +11,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='ChordReviewsVis',
-    version='0.3.3',
+    version='0.3.4',
     description="Process reviews data, apply text preprocessing, and generate a chord plot visualization showing word co-occurrence patterns and sentiment analysis.",
     packages=find_packages(),
     long_description=long_description,
