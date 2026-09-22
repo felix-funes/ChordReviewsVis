@@ -98,7 +98,7 @@ from ChordReviewsVis import ChordReviews
 df = pd.read_csv("https://github.com/felix-funes/ChordReviewsVis/raw/main/Test%20Dataset%20-%20IMDB%20Movie%20Reviews.csv")
 
 # Generate chord plot
-chord_reviews(df, 'Review', stemming=False, lemmatization=True, stopwords_to_add=["wa", "ha"], words_to_replace={"movie": "film"})
+ChordReviews(df, 'Review', stemming=False, lemmatization=True, stopwords_to_add=["wa", "ha"], words_to_replace={"movie": "film"})
 ```
 ![Chord plot using the words_to_replace parameter](https://raw.githubusercontent.com/felix-funes/ChordReviewsVis/8335a92c77d0420a9a1eee8db509eae5cdde7af3/Sample%20Chord%20Plot%20-%20IMDB%20Dataset%20-%20Replacing%20words.svg)
 
@@ -112,7 +112,7 @@ from ChordReviewsVis import ChordReviews
 df = pd.read_csv("https://github.com/felix-funes/ChordReviewsVis/raw/main/Test%20Dataset%20-%20IMDB%20Movie%20Reviews.csv")
 
 # Generate chord plot
-chord_reviews(df, 'Review', stemming=False, lemmatization=True, stopwords_to_add=["wa", "ha", "movie", "film"], label_text_font_size=13, size=400)
+ChordReviews(df, 'Review', stemming=False, lemmatization=True, stopwords_to_add=["wa", "ha", "movie", "film"], label_text_font_size=13, size=400)
 
 ```
 ![Large chord plot with stop words](https://raw.githubusercontent.com/felix-funes/ChordReviewsVis/8335a92c77d0420a9a1eee8db509eae5cdde7af3/Sample%20Chord%20Plot%20-%20IMDB%20Dataset%20-%20Stop%20words%20and%20larger%20size.svg)
