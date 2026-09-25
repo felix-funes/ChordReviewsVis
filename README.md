@@ -10,7 +10,7 @@ Developed by **Félix José Funes** for a master's dissertation at **NOVA Inform
 
 [Problem](#why-this-project-exists) · [My contribution](#my-contribution) · [Design decisions](#design-decisions-and-trade-offs) · [Evaluation](#evaluation-and-findings) · [Getting started](#getting-started)
 
-![Chord diagram generated from IMDb movie reviews](https://raw.githubusercontent.com/felix-funes/ChordReviewsVis/refs/heads/docs/product-readme/Sample%20Chord%20Plot%20-%20IMDB%20Dataset%20-%20Stop%20words%20and%20larger%20size.svg)
+![Chord diagram generated from IMDb movie reviews](Sample%20Chord%20Plot%20-%20IMDB%20Dataset%20-%20Stop%20words%20and%20larger%20size.svg)
 
 *Example from the original project. Connections represent selected word pairs and colours indicate estimated sentiment.*
 
