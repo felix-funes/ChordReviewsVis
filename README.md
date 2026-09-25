@@ -67,8 +67,6 @@ I developed and evaluated the prototype using **design science research**: build
 
 The evaluation demonstrated applications across three domains and showed how configuration affects the output. Sentiment colours were compared with aggregate review ratings as a plausibility check. Labelled sentiment benchmarks, controlled usability studies and measured business outcomes remain outside the evidence established by this study.
 
-*The dataset sizes and processing times describe the original research artifact, rather than a benchmark of the current repository or the size of its sample files.*
-
 ## What I learned
 
 **Useful exploration requires iteration.** In the IMDb analysis, consolidating “movie” into “film” made the dominant topic clearer. Excluding both terms then exposed other relationships, including “give–performance”, but also uninformative pairs such as “thing–time”. Producing more visible relationships did not automatically produce more useful insights.
