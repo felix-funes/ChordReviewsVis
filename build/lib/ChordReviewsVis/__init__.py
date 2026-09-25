@@ -1,1 +1,0 @@
-from .ChordReviews import ChordReviews
