@@ -28,7 +28,7 @@ The direct users are **analysts and researchers working with review data in Pyth
 
 The intended workflow is to load reviews, adapt the vocabulary and preprocessing to the domain, inspect recurring relationships, and use the original comments to investigate what those patterns mean. Understanding of this need came from the literature review and analysis of review datasets.
 
-For example, the clothing-review analysis highlighted relationships involving **fit** and **size**. A product team could use that observation to investigate sizing guidance or examine related complaints. That is a potential application of the finding; the study did not establish that sizing guidance needed changing.
+For example, the clothing-review analysis highlighted relationships involving **fit** and **size**. A product team could use that observation to investigate sizing guidance or examine related complaints.
 
 **The intended user outcome:** identify meaningful themes and relationships that help focus further investigation and communicate customer feedback. The prototype evaluation assessed progress toward this outcome through worked scenarios.
 
