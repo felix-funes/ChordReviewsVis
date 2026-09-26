@@ -1,12 +1,12 @@
 # ChordReviewsVis
 
-**A research-led data product case study: exploring customer feedback with NLP and visualization.**
+**A research-led data product: exploring customer feedback with NLP and visualization.**
 
 ChordReviewsVis turns English-language reviews into chord diagrams that bring recurring word relationships and sentiment indicators into one view. The project explores how a reusable analysis tool can help researchers and analysts investigate customer feedback and communicate patterns to product and marketing teams.
 
 Developed by **Félix José Funes** for a master's dissertation at **NOVA Information Management School**, supervised by **Prof. Nuno António**.
 
-**Project at a glance:** Python package · NLP and sentiment analysis · Evaluation across tourism, retail and media · Research prototype
+**Project at a glance:** Python package · NLP and sentiment analysis · Evaluation · Research prototype
 
 [Problem](#why-this-project-exists) · [My contribution](#my-contribution) · [Design decisions](#design-decisions-and-trade-offs) · [Evaluation](#evaluation-and-findings) · [Getting started](#getting-started)
 
@@ -18,13 +18,13 @@ Developed by **Félix José Funes** for a master's dissertation at **NOVA Inform
 
 Customer feedback already informs business decisions. A 2015 study by [Torres et al.](https://stars.library.ucf.edu/ucfscholar/542/) reported that **90% of the hotel general managers surveyed read online reviews daily**. Managers used this feedback to identify recurring complaints and plan recovery strategies.
 
-The challenge is extracting useful meaning from large volumes of unstructured text. An average rating summarises an experience without explaining it. Word clouds highlight frequent terms, while word trees show language in context; the literature review identified an opportunity to bring frequency, word relationships and sentiment together in one visualization.
+The challenge is extracting useful meaning from large volumes of unstructured text. An average rating summarises an experience without explaining it. Word clouds highlight frequent terms, while word trees show language in context. The literature review identified an opportunity to bring frequency, word relationships and sentiment together in one visualization.
 
 The research question was how text mining and visualization could improve the discovery of insights from online reviews. ChordReviewsVis explores that question through a configurable Python package, building on prior research into chord visualizations of reviews by [António et al. (2018)](https://doi.org/10.1007/s40558-018-0107-x).
 
 ## Intended users and value
 
-The direct users are **analysts and researchers working with review data in Python**. Product and marketing teams can use their analysis to investigate frequently discussed product attributes, customer language and potential areas for improvement.
+The direct users are **analysts and researchers working with review data in Python**. Product and marketing teams can use their analysis to investigate frequently discussed product attributes, customer language, and potential areas for improvement.
 
 The intended workflow is to load reviews, adapt the vocabulary and preprocessing to the domain, inspect recurring relationships, and use the original comments to investigate what those patterns mean. Understanding of this need came from the literature review and analysis of review datasets.
 
@@ -36,9 +36,9 @@ For example, the clothing-review analysis highlighted relationships involving **
 
 I took the project from research through implementation and evaluation:
 
-- **Researched the problem and existing approaches:** reviewed online-review analysis, NLP and visualization methods to identify the opportunity for a combined view.
-- **Designed and implemented the artifact:** built the preprocessing, word-pair analysis, sentiment and visualization workflow, and packaged it for reuse in Python.
-- **Made the analysis configurable:** exposed vocabulary replacements, additional stop words, stemming and lemmatization so users could adapt it to different domains.
+- **Researched the problem and existing approaches:** reviewed online-review analysis, NLP, and visualization methods to identify the opportunity for a combined view.
+- **Designed and implemented the artifact:** built the preprocessing, word-pair analysis, sentiment, and visualization workflow, and packaged it for reuse in Python.
+- **Made the analysis configurable:** exposed vocabulary replacements, additional stop words, stemming, and lemmatization so users could adapt it to different domains.
 - **Evaluated and documented the results:** applied the tool across three review domains, examined its outputs and processing times, and identified limitations and directions for further research.
 
 ## Design decisions and trade-offs
@@ -47,7 +47,7 @@ The initial scope centred on a reusable, configurable exploration tool. These de
 
 | Decision | Rationale | Trade-off |
 | --- | --- | --- |
-| Combine NLP with chord diagrams | Bring word frequency, relationships and sentiment indicators into one view. | Dense diagrams need interpretation. |
+| Combine NLP with chord diagrams | Bring word frequency, relationships, and sentiment indicators into one view. | Dense diagrams need interpretation. |
 | Package the workflow in Python | Make the method reusable across datasets and research workflows. | Direct users need Python skills and a suitable environment. |
 | Use VADER, a general sentiment lexicon | Support different review domains without collecting a separate sentiment-training dataset for each one. | General lexical sentiment can miss domain meaning and context. |
 | Offer custom stop words and replacements | Let users remove dominant terms and consolidate vocabulary relevant to their dataset. | Settings change which relationships become visible and require judgement. |
@@ -57,7 +57,7 @@ The study also made a deliberate evaluation choice: **scenario-based assessment 
 
 ## Evaluation and findings
 
-I developed and evaluated the prototype using **design science research**: building a tool and assessing how well it addressed its intended purpose. The evaluation used an **informed argument** approach: applying the package to concrete scenarios and assessing the outputs against functionality, completeness, consistency, accuracy, performance, reliability and usability criteria.
+I developed and evaluated the prototype using **design science research**: building a tool and assessing how well it addressed its intended purpose. The evaluation used an **informed argument** approach: applying the package to concrete scenarios and assessing the outputs against functionality, completeness, consistency, accuracy, performance, reliability, and usability criteria.
 
 | Scenario | Reviews in the research dataset | What the demonstration surfaced |
 | --- | ---: | --- |
@@ -65,7 +65,7 @@ I developed and evaluated the prototype using **design science research**: build
 | Retail: women's clothing e-commerce reviews | 23,486 | Recurring language around fit and size. |
 | Media: IMDb film reviews | 50,000 | How vocabulary replacements and exclusions change the relationships visible in the chart. |
 
-The evaluation demonstrated applications across three domains and showed how configuration affects the output. Sentiment colours were compared with aggregate review ratings as a plausibility check. Labelled sentiment benchmarks, controlled usability studies and measured business outcomes remain outside the evidence established by this study.
+The evaluation demonstrated applications across three domains and showed how configuration affects the output. Sentiment colours were compared with aggregate review ratings as a plausibility check. Labelled sentiment benchmarks, controlled usability studies, and measured business outcomes remain outside the evidence established by this study.
 
 ## What I learned
 
@@ -80,7 +80,7 @@ The evaluation demonstrated applications across three domains and showed how con
 Based on the evaluation and a review of the current implementation, I would prioritise:
 
 1. **Evaluate usefulness with target users.** Test whether analysts can identify and explain meaningful patterns, compare the workflow with simpler alternatives, and assess sentiment against manually labelled examples.
-2. **Help users inspect the evidence.** Explore filtering, highlighting and access to source review passages, so a visible relationship can lead to closer investigation.
+2. **Help users inspect the evidence.** Explore filtering, highlighting, and access to source review passages, so a visible relationship can lead to closer investigation.
 
 ## Getting started
 
@@ -100,7 +100,7 @@ NLTK also needs language resources. With a current NLTK installation, download t
 python -m nltk.downloader punkt_tab averaged_perceptron_tagger_eng stopwords wordnet vader_lexicon
 ```
 
-See the [NLTK data installation guide](https://www.nltk.org/data.html) for resource locations and troubleshooting. A tested Python and dependency compatibility matrix is not yet available for this project.
+See the [NLTK data installation guide](https://www.nltk.org/data.html) for resource locations and troubleshooting. 
 
 ### A small example
 
@@ -159,9 +159,9 @@ To use stemming, set `stemming=True` and `lemmatization=False`. Compare the read
 | Connections | Word pairs selected by the current counting algorithm. |
 | Connection weight | More occurrences produce a stronger visual connection. This is a pair-occurrence count, not a count of unique reviewers. |
 | Connection colour | Red indicates negative, blue indicates neutral, and green indicates positive estimated sentiment. |
-| Node shading | Intended to indicate term frequency. The current scaling has limitations; do not treat it as a calibrated frequency measure. |
+| Node shading | Indicates term frequency. The darker the color, the more frequent the word is in the dataset. |
 
-The current implementation counts words **two positions apart in the filtered token sequence**, keeps pairs meeting `min_pair_frequency`, and selects up to the **50 most frequent pairs**. Preprocessing removes punctuation before sentence splitting, so these are not reliable counts of pairs occurring within original sentence boundaries.
+The current implementation counts words **two positions apart in the filtered token sequence**, keeps pairs meeting `min_pair_frequency`, and selects up to the **50 most frequent pairs**. Preprocessing removes punctuation before sentence splitting, so these are not counts of pairs occurring within original sentence boundaries.
 
 Sentiment is calculated with VADER on a constructed phrase containing each pair, rather than on the original review passage. The resulting colours are approximate lexical signals. They do not establish how a customer felt about a specific product attribute.
 
