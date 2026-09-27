@@ -1,2 +1,8 @@
 # Generated Python build files
 /build/
+
+# Python bytecode caches
+__pycache__/
+
+# Generated Python package metadata
+*.egg-info/
