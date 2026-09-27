@@ -33,11 +33,24 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
     hv.Chord: Chord plot visualization.
 
     Raises:
-    ValueError: If no word pairs meet min_pair_frequency.
+    ValueError: If text_column is missing, the input contains no rows,
+        or no word pairs meet min_pair_frequency.
 
     Notes:
     Errors propagate to the caller instead of being printed and returning None.
     """
+
+    if text_column not in df.columns:
+        raise ValueError(
+            f"text_column '{text_column}' was not found in the input DataFrame. "
+            "Choose a column containing review text."
+        )
+
+    if len(df.index) == 0:
+        raise ValueError(
+            "The input DataFrame must contain at least one review."
+        )
+
     # Text preprocessing function
     def text_preprocess(raw_text, remove_HTML=True, chars_to_remove=r'\?|\.|\!|\;|\.|\"|\,|\(|\)|\&|\:|\-|\\|\/|\[|\]|\{|\}|\=|\+|\*|\%|\$|\@|\#|\_|\`|\~|\>|\<|\^|\|', 
                         remove_numbers=True, remove_line_breaks=False, 
