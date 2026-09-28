@@ -34,7 +34,8 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
 
     Raises:
     ValueError: If text_column is missing, the input contains no rows,
-        or no word pairs meet min_pair_frequency.
+        any review text is missing or blank, or no word pairs meet
+        min_pair_frequency.
 
     Notes:
     Errors propagate to the caller instead of being printed and returning None.
@@ -49,6 +50,23 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
     if len(df.index) == 0:
         raise ValueError(
             "The input DataFrame must contain at least one review."
+        )
+
+    review_text = df[text_column]
+
+    missing_text = review_text.isna()
+    blank_text = review_text.map(
+        lambda value: isinstance(value, str) and not value.strip()
+    )
+
+    invalid_text = missing_text | blank_text
+    invalid_count = int(invalid_text.sum())
+
+    if invalid_count > 0:
+        raise ValueError(
+            f"Column '{text_column}' contains {invalid_count} row(s) "
+            "with missing or blank review text. "
+            "Fill in or explicitly remove these rows before calling ChordReviews."
         )
 
     # Text preprocessing function
