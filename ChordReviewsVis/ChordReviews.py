@@ -27,19 +27,35 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
     lemmatization (bool, optional): Whether to apply lemmatization to words (default is True).
     words_to_replace (dict, optional): A dictionary where keys are words to be replaced and values are the replacements (default is {}).
     label_text_font_size (int, optional): Font size for the labels in the chord plot (default is 12).
-    min_pair_frequency (int, optional): Minimum number of co‑occurrences required for a word‑pair to appear in the chord plot. For example, `number_of_pairs=5` will only draw edges for word‑pairs that appear together in at least five sentences. For smaller data sets, this threshold should not be very high. For larger ones, it's better to increase it to reduce the amount of irrelevant data (default is 100).
+    min_pair_frequency (int, optional): Minimum number of counted occurrences
+        required for a word pair to appear in the chord plot. Must be a positive
+        integer; booleans and floats are not accepted. Use lower thresholds for
+        smaller datasets (default is 100).
 
     Returns:
     hv.Chord: Chord plot visualization.
 
     Raises:
-    ValueError: If text_column is missing, the input contains no rows,
-        any review text is missing or blank, or no word pairs meet
-        min_pair_frequency.
+    TypeError: If min_pair_frequency is not an integer or is a boolean.
+    ValueError: If min_pair_frequency is less than 1, text_column is missing,
+        the input contains no rows, any review text is missing or blank,
+        or no word pairs meet min_pair_frequency.
 
     Notes:
     Errors propagate to the caller instead of being printed and returning None.
     """
+
+    if isinstance(min_pair_frequency, bool) or not isinstance(
+        min_pair_frequency, int
+    ):
+        raise TypeError(
+            "min_pair_frequency must be a positive integer."
+        )
+
+    if min_pair_frequency < 1:
+        raise ValueError(
+            "min_pair_frequency must be a positive integer."
+        )
 
     if text_column not in df.columns:
         raise ValueError(
