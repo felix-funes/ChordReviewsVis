@@ -14,6 +14,17 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 import holoviews as hv
 from holoviews import opts, dim
 
+def _scale_frequencies(frequencies):
+    """Scale positive word counts relative to their maximum, rounding down."""
+    if frequencies.empty:
+        return frequencies.astype("int64")
+
+    highest_frequency = frequencies.max()
+
+    return (
+        frequencies / highest_frequency * 100
+    ).astype("int64")
+
 def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False, lemmatization=True, words_to_replace={}, label_text_font_size=12, min_pair_frequency=100):
     """
     Process reviews data, apply text preprocessing, and generate a chord plot visualization showing word co-occurrence patterns and sentiment analysis.
@@ -199,7 +210,9 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
     df_fdist = df_fdist.sort_values(by='Frequency', ascending=False)
 
     # Scale the frequency of each word to a 0-100 scale
-    df_fdist['Frequency_Scaled'] = df_fdist['Frequency'].apply(lambda number: int(((number - 1) / (len(df_fdist) - 1)) * 100))
+    df_fdist["Frequency_Scaled"] = _scale_frequencies(
+        df_fdist["Frequency"]
+    )
 
     # Preprocess text for word co-occurrence
     sentences['ProcessedText'] = sentences['WordsCleaned'].apply(lambda words: ' '.join(words))
