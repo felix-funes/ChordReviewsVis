@@ -174,20 +174,20 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
         else:
             return np.nan
 
-    # Text preprocessing
-    df['PreProcessedText'] = df[text_column].apply(text_preprocess)
+    # Split reviews into sentences before cleaning removes punctuation.
+    sentence_rows = []
 
-    # Tokenize sentences
-    sentences = pd.DataFrame(data=[sent_tokenize(text) for text in df['PreProcessedText']], columns=['BaseText'])
-    df['RevID'] = df.index
-    sentences['RevID'] = sentences.index
+    for review_id, review in df[text_column].items():
+        for sentence in sent_tokenize(str(review)):
+            sentence_rows.append({
+                "RevID": review_id,
+                "BaseText": text_preprocess(sentence),
+            })
 
-    # Convert NA rows into empty strings
-    sentences['BaseText'] = sentences['BaseText'].fillna('')
-
-    # Add a column with the review ID
-    sentencesPerReview = [len(elem) for elem in sentences['BaseText']]
-    sentences['RevID'] = np.repeat(df['RevID'].values, np.repeat(1, len(sentencesPerReview)))
+    sentences = pd.DataFrame(
+        sentence_rows,
+        columns=["RevID", "BaseText"],
+    )
 
     # Get words
     sentences['Words'] = sentences['BaseText'].apply(tokenize_words)
