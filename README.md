@@ -123,24 +123,23 @@ reviews = pd.DataFrame({
 })
 
 plot = ChordReviews(
-    reviews.copy(),
+    reviews,
     text_column="review",
     min_pair_frequency=1,
     stemming=False,
     lemmatization=True,
 )
 
-if plot is None:
-    raise RuntimeError("No chart was created. Check the error printed above.")
-
 hv.save(plot, "review-patterns.svg", backend="matplotlib")
 ```
 
 The example requests an SVG named `review-patterns.svg` in the current working directory. In a notebook, evaluating `plot` also displays the chart. See the [HoloViews export guide](https://holoviews.org/user_guide/Exporting_and_Archiving.html) for other output formats.
 
-`min_pair_frequency=1` allows pairs from this small dataset to appear. The default is `100`, which can exclude every pair in a small sample. Passing `reviews.copy()` protects the original DataFrame because the current function adds working columns to its input.
+`min_pair_frequency=1` allows pairs from this small dataset to appear. The default is `100`, which can exclude every pair in a small sample. The function processes reviews without adding working columns to the input DataFrame.
 
-For your own data, use one review per row and supply the exact, case-sensitive name of the text column. Start with non-empty English strings; missing and empty inputs need stronger handling in the current implementation.
+For your own data, use one review per row and supply the exact, case-sensitive name of the text column. The intended input is English-language review text. Missing values, empty strings and whitespace-only reviews are rejected; the error reports how many rows need attention. Fill in or explicitly remove these rows before running the analysis.
+
+`min_pair_frequency` must be a positive Python integer. Booleans, floats and other types raise `TypeError`; zero and negative integers raise `ValueError`. A missing text column, a dataset with no rows, or no qualifying word pairs also raises `ValueError` with an explanatory message.
 
 ### Adapting the analysis
 
@@ -159,9 +158,11 @@ To use stemming, set `stemming=True` and `lemmatization=False`. Compare the read
 | Connections | Word pairs selected by the current counting algorithm. |
 | Connection weight | More occurrences produce a stronger visual connection. This is a pair-occurrence count, not a count of unique reviewers. |
 | Connection colour | Red indicates negative, blue indicates neutral, and green indicates positive estimated sentiment. |
-| Node shading | Indicates term frequency. The darker the color, the more frequent the word is in the dataset. |
+| Node shading | Term frequency relative to the most frequent term in the dataset, scaled to 0–100 and rounded down. Higher values are darker. Shades do not represent comparable absolute counts across different datasets. |
 
-The current implementation counts words **two positions apart in the filtered token sequence**, keeps pairs meeting `min_pair_frequency`, and selects up to the **50 most frequent pairs**. Preprocessing removes punctuation before sentence splitting, so these are not counts of pairs occurring within original sentence boundaries.
+The implementation splits each review into sentences before cleaning the text. Within each sentence, it counts pairs of distinct words at distances of **one or two positions in the filtered token sequence**: adjacent words, or words with one retained word between them. Distance is measured after stopword and grammatical filtering, so it can differ from spacing in the original review.
+
+Repeated occurrences accumulate across sentences and reviews. Reversed pairs, such as “hotel–room” and “room–hotel”, contribute to the same count. The chart keeps pairs meeting `min_pair_frequency` and selects up to the **50 most frequent pairs**.
 
 Sentiment is calculated with VADER on a constructed phrase containing each pair, rather than on the original review passage. The resulting colours are approximate lexical signals. They do not establish how a customer felt about a specific product attribute.
 
@@ -171,11 +172,11 @@ Sentiment is calculated with VADER on a constructed phrase containing each pair,
 <summary>Current implementation limitations</summary>
 
 - **English-language scope:** development and evaluation used English reviews. Other languages have not been validated.
-- **Context loss:** preprocessing and pair extraction can discard sentence boundaries and information needed for sentiment interpretation.
-- **Visual scaling:** the current term-frequency scaling can generate values outside its intended colour range.
-- **Input and error handling:** empty inputs, missing resources, or thresholds that exclude every pair can cause failures. The function currently prints an error and returns `None`.
+- **Sentiment context:** sentiment is calculated from constructed phrases containing word pairs, not the original passages. Negation, domain meaning and other context may be lost.
+- **Filtered-word distance:** removing words changes which terms are adjacent or two positions apart. Co-occurrence is an exploratory signal, not proof of a meaningful relationship.
 - **Text replacement:** replacements use substring matching, so they can also affect parts of longer words.
-- **Reproducibility:** compatibility testing, automated regression tests, and repeatable benchmarks are improvement priorities.
+- **Configuration:** mutable list/dictionary defaults and the interaction between stemming and lemmatization remain improvement priorities.
+- **Verification scope:** 16 automated tests cover selected validation, scaling and pair-extraction behaviours. GitHub Actions installs the package and runs them on Ubuntu with Python 3.14. This does not establish compatibility with every environment, sentiment accuracy or usefulness to users.
 
 </details>
 
@@ -200,7 +201,7 @@ ChordReviews(
 
 | Parameter | Default | Purpose |
 | --- | --- | --- |
-| `df` | Required | pandas DataFrame containing the reviews. Pass a copy to protect the original. |
+| `df` | Required | pandas DataFrame containing one review per row. |
 | `text_column` | Required | Exact name of the text column. |
 | `size` | `300` | HoloViews output-size setting, passed to `hv.output(size=...)`; not a pixel width. |
 | `stopwords_to_add` | `[]` | Extra terms to exclude alongside NLTK's English stop words. |
@@ -210,8 +211,9 @@ ChordReviews(
 | `label_text_font_size` | `12` | Font size for term labels. |
 | `min_pair_frequency` | `100` | Minimum number of counted pair occurrences required for inclusion. |
 
-**Returns:** a HoloViews `hv.Chord` object on successful construction. Rendering and export are separate steps and may reveal additional plotting issues. Processing failures print an error and return `None`.
+**Returns:** a HoloViews `hv.Chord` object on successful construction. Rendering and export are separate steps and may reveal additional plotting issues.
 
+**Errors:** invalid inputs and the absence of qualifying pairs raise the exceptions described above. Other processing errors propagate to the caller rather than being printed and replaced with `None`.
 </details>
 
 ## Feedback and licence
