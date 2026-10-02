@@ -1,0 +1,44 @@
+name: Python tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      MPLBACKEND: Agg
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install package and dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install .
+
+      - name: Download NLTK resources
+        run: >
+          python -m nltk.downloader -q
+          punkt_tab
+          stopwords
+          wordnet
+          averaged_perceptron_tagger_eng
+          vader_lexicon
+
+      - name: Run tests against installed package
+        run: python -I -m unittest discover -s tests -v
