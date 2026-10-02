@@ -25,6 +25,40 @@ def _scale_frequencies(frequencies):
         frequencies / highest_frequency * 100
     ).astype("int64")
 
+def _count_word_pairs(texts, max_distance, threshold):
+    """Count unordered word pairs within each filtered sentence.
+
+    Args:
+        texts: Iterable of strings, each representing one filtered sentence.
+        max_distance: Maximum positional distance between paired words.
+        threshold: Minimum total occurrence count required to retain a pair.
+
+    Returns:
+        List of (pair, count) tuples in descending frequency order.
+        Identical-word pairs are excluded.
+    """
+    word_pairs_counter = Counter()
+
+    for text in texts:
+        words = text.split()
+
+        for distance in range(1, max_distance + 1):
+            for i in range(len(words) - distance):
+                first_word = words[i]
+                second_word = words[i + distance]
+
+                if first_word != second_word:
+                    pair = tuple(sorted((first_word, second_word)))
+                    word_pairs_counter[pair] += 1
+
+    filtered_word_pairs_counter = Counter({
+        pair: count
+        for pair, count in word_pairs_counter.items()
+        if count >= threshold
+    })
+
+    return filtered_word_pairs_counter.most_common()
+
 def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False, lemmatization=True, words_to_replace={}, label_text_font_size=12, min_pair_frequency=100):
     """
     Process reviews data, apply text preprocessing, and generate a chord plot visualization showing word co-occurrence patterns and sentiment analysis.
@@ -246,36 +280,9 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
 
     sentences['FilteredText'] = sentences['WordsCleaned'].apply(filter_grammatical_words)
 
-    # Count word pairs within a maximum distance in each sentence.
-    def count_word_pairs(
-        df, column_name, max_distance, threshold=min_pair_frequency
-    ):
-        word_pairs_counter = Counter()
-
-        for text in df[column_name]:
-            words = text.split()
-
-            for distance in range(1, max_distance + 1):
-                for i in range(len(words) - distance):
-                    first_word = words[i]
-                    second_word = words[i + distance]
-
-                    if first_word != second_word:
-                        pair = tuple(sorted((first_word, second_word)))
-                        word_pairs_counter[pair] += 1
-
-        filtered_word_pairs_counter = Counter({
-            pair: count
-            for pair, count in word_pairs_counter.items()
-            if count >= threshold
-        })
-
-        return filtered_word_pairs_counter.most_common()
-
     # Include adjacent pairs and distance-two pairs after word filtering.
-    word_pairs_at_distance = count_word_pairs(
-        sentences,
-        "FilteredText",
+    word_pairs_at_distance = _count_word_pairs(
+        sentences["FilteredText"],
         max_distance=2,
         threshold=min_pair_frequency,
     )
