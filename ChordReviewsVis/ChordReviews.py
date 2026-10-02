@@ -34,8 +34,10 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
     text_column (str): Name of the column containing the text data.
     size (int, optional): Size of the output chord plot (default is 300).
     stopwords_to_add (list, optional): Additional stopwords to be included in the stop words set (default is []).
-    stemming (bool, optional): Whether to apply stemming to words (default is False).
-    lemmatization (bool, optional): Whether to apply lemmatization to words (default is True).
+    stemming (bool, optional): Whether to apply stemming (default is False).
+        Cannot be enabled together with lemmatization.
+    lemmatization (bool, optional): Whether to apply lemmatization
+        (default is True). Cannot be enabled together with stemming.
     words_to_replace (dict, optional): Complete-word replacements applied after
         text normalization, in dictionary order. Keys are case-sensitive and
         should match the normalized text (default is {}).
@@ -50,13 +52,19 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
 
     Raises:
     TypeError: If min_pair_frequency is not an integer or is a boolean.
-    ValueError: If min_pair_frequency is less than 1, text_column is missing,
+    ValueError: If stemming and lemmatization are both enabled,
+        min_pair_frequency is less than 1, text_column is missing,
         the input contains no rows, any review text is missing or blank,
         or no word pairs meet min_pair_frequency.
 
     Notes:
     Errors propagate to the caller instead of being printed and returning None.
     """
+    if stemming and lemmatization:
+        raise ValueError(
+            "stemming and lemmatization cannot both be enabled. "
+            "Set either stemming=False or lemmatization=False."
+        )
 
     if isinstance(min_pair_frequency, bool) or not isinstance(
         min_pair_frequency, int
