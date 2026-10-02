@@ -231,24 +231,39 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
 
     sentences['FilteredText'] = sentences['WordsCleaned'].apply(filter_grammatical_words)
 
-    # Function to count pairs of words at a certain distance
-    def count_word_pairs(df, column_name, n, threshold=min_pair_frequency):
+    # Count word pairs within a maximum distance in each sentence.
+    def count_word_pairs(
+        df, column_name, max_distance, threshold=min_pair_frequency
+    ):
         word_pairs_counter = Counter()
 
         for text in df[column_name]:
             words = text.split()
-            for i in range(len(words) - n):
-                if words[i] != words[i + n]:
-                    pair = tuple(sorted((words[i], words[i + n])))
-                    word_pairs_counter[pair] += 1
 
-        filtered_word_pairs_counter = Counter({pair: count for pair, count in word_pairs_counter.items() if count >= threshold})
-        sorted_word_pairs_counter = filtered_word_pairs_counter.most_common()
+            for distance in range(1, max_distance + 1):
+                for i in range(len(words) - distance):
+                    first_word = words[i]
+                    second_word = words[i + distance]
 
-        return sorted_word_pairs_counter
+                    if first_word != second_word:
+                        pair = tuple(sorted((first_word, second_word)))
+                        word_pairs_counter[pair] += 1
 
-    # Get word pairs at a distance of 2 that meet the configured frequency threshold
-    word_pairs_at_distance = count_word_pairs(sentences, 'FilteredText', 2, min_pair_frequency)
+        filtered_word_pairs_counter = Counter({
+            pair: count
+            for pair, count in word_pairs_counter.items()
+            if count >= threshold
+        })
+
+        return filtered_word_pairs_counter.most_common()
+
+    # Include adjacent pairs and distance-two pairs after word filtering.
+    word_pairs_at_distance = count_word_pairs(
+        sentences,
+        "FilteredText",
+        max_distance=2,
+        threshold=min_pair_frequency,
+    )
 
     if not word_pairs_at_distance:
         raise ValueError(
