@@ -36,7 +36,9 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
     stopwords_to_add (list, optional): Additional stopwords to be included in the stop words set (default is []).
     stemming (bool, optional): Whether to apply stemming to words (default is False).
     lemmatization (bool, optional): Whether to apply lemmatization to words (default is True).
-    words_to_replace (dict, optional): A dictionary where keys are words to be replaced and values are the replacements (default is {}).
+    words_to_replace (dict, optional): Complete-word replacements applied after
+        text normalization, in dictionary order. Keys are case-sensitive and
+        should match the normalized text (default is {}).
     label_text_font_size (int, optional): Font size for the labels in the chord plot (default is 12).
     min_pair_frequency (int, optional): Minimum number of counted occurrences
         required for a word pair to appear in the chord plot. Must be a positive
@@ -154,9 +156,14 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
         if remove_consecutive_spaces:
             proc_text = re.sub(' +', ' ', proc_text)
 
-        # Replace words
+        # Replace complete words without changing parts of longer words.
         for word, replacement in words_to_replace.items():
-            proc_text = proc_text.replace(word, replacement)
+            pattern = r"\b" + re.escape(word) + r"\b"
+            proc_text = re.sub(
+                pattern,
+                lambda match: replacement,
+                proc_text,
+            )
 
         return proc_text
 

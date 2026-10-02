@@ -174,9 +174,8 @@ Sentiment is calculated with VADER on a constructed phrase containing each pair,
 - **English-language scope:** development and evaluation used English reviews. Other languages have not been validated.
 - **Sentiment context:** sentiment is calculated from constructed phrases containing word pairs, not the original passages. Negation, domain meaning and other context may be lost.
 - **Filtered-word distance:** removing words changes which terms are adjacent or two positions apart. Co-occurrence is an exploratory signal, not proof of a meaningful relationship.
-- **Text replacement:** replacements use substring matching, so they can also affect parts of longer words.
 - **Configuration:** mutable list/dictionary defaults and the interaction between stemming and lemmatization remain improvement priorities.
-- **Verification scope:** 16 automated tests cover selected validation, scaling and pair-extraction behaviours. GitHub Actions installs the package and runs them on Ubuntu with Python 3.14. This does not establish compatibility with every environment, sentiment accuracy or usefulness to users.
+- **Verification scope:** 17 automated tests cover selected validation, scaling and pair-extraction behaviours. GitHub Actions installs the package and runs them on Ubuntu with Python 3.14. This does not establish compatibility with every environment, sentiment accuracy or usefulness to users.
 
 </details>
 
@@ -207,7 +206,7 @@ ChordReviews(
 | `stopwords_to_add` | `[]` | Extra terms to exclude alongside NLTK's English stop words. |
 | `stemming` | `False` | Apply English Snowball stemming. Disable lemmatization when selecting this option. |
 | `lemmatization` | `True` | Apply WordNet lemmatization. |
-| `words_to_replace` | `{}` | Mapping of text strings to replacements, applied after lowercasing. |
+| `words_to_replace` | `{}` | Mapping of complete words to replacements, applied after normalization and in dictionary order. |
 | `label_text_font_size` | `12` | Font size for term labels. |
 | `min_pair_frequency` | `100` | Minimum number of counted pair occurrences required for inclusion. |
 
