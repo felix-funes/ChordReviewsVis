@@ -164,7 +164,7 @@ The implementation splits each review into sentences before cleaning the text. W
 
 Repeated occurrences accumulate across sentences and reviews. Reversed pairs, such as “hotel–room” and “room–hotel”, contribute to the same count. The chart keeps pairs meeting `min_pair_frequency` and selects up to the **50 most frequent pairs**.
 
-Sentiment is calculated with VADER on a constructed phrase containing each pair, rather than on the original review passage. The resulting colours are approximate lexical signals. They do not establish how a customer felt about a specific product attribute.
+Connection colours summarise VADER sentiment from the original sentences containing each pair, averaged across pair occurrences. Repeated occurrences contribute repeatedly. These colours provide sentence-level context, not attribute-specific sentiment. Opposing opinions can average to a neutral-looking result.
 
 </details>
 
@@ -172,10 +172,10 @@ Sentiment is calculated with VADER on a constructed phrase containing each pair,
 <summary>Current implementation limitations</summary>
 
 - **English-language scope:** development and evaluation used English reviews. Other languages have not been validated.
-- **Sentiment context:** sentiment is calculated from constructed phrases containing word pairs, not the original passages. Negation, domain meaning and other context may be lost.
+- **Sentiment context:** a sentence can express different opinions about different attributes, but all its pairs receive the same sentence score. VADER can still misinterpret sarcasm and domain-specific language.
 - **Filtered-word distance:** removing words changes which terms are adjacent or two positions apart. Co-occurrence is an exploratory signal, not proof of a meaningful relationship.
 - **Configuration:** mutable list/dictionary defaults remain a deferred maintenance improvement.
-- **Verification scope:** 19 automated tests cover selected validation, scaling and pair-extraction behaviours. GitHub Actions installs the package and runs them on Ubuntu with Python 3.14. This does not establish compatibility with every environment, sentiment accuracy or usefulness to users.
+- **Verification scope:** 24 automated tests cover selected validation, scaling, pair-extraction and sentiment-attribution behaviours. GitHub Actions installs the package and runs them on Ubuntu with Python 3.14. This does not establish compatibility with every environment, sentiment accuracy or usefulness to users.
 
 </details>
 

@@ -59,16 +59,44 @@ def _count_word_pairs(texts, max_distance, threshold):
 
     return filtered_word_pairs_counter.most_common()
 
-def _add_pair_sentiment(word_pairs):
-    """Return word pairs with constructed-phrase sentiment and polarity."""
+def _add_pair_sentiment(word_pairs, sentences, max_distance=2):
+    """Add occurrence-weighted mean original-sentence sentiment.
+
+    Each pair occurrence receives the VADER compound score of its
+    original sentence. Repeated occurrences contribute repeatedly.
+    Pair extraction uses the same filtered text and distance rule
+    as connection counting.
+    """
     result = word_pairs.copy()
     analyzer = SentimentIntensityAnalyzer()
 
-    def score_pair(row):
-        text = f"The {row['target']} is {row['source']}."
-        return analyzer.polarity_scores(text)["compound"]
+    score_totals = Counter()
+    occurrence_totals = Counter()
 
-    result["Sentiment Strength"] = result.apply(score_pair, axis=1)
+    for original_text, filtered_text in zip(
+        sentences["OriginalText"],
+        sentences["FilteredText"],
+    ):
+        sentence_score = analyzer.polarity_scores(original_text)["compound"]
+
+        sentence_pairs = _count_word_pairs(
+            [filtered_text],
+            max_distance=max_distance,
+            threshold=1,
+        )
+
+        for pair, count in sentence_pairs:
+            score_totals[pair] += sentence_score * count
+            occurrence_totals[pair] += count
+
+    def average_pair_score(row):
+        pair = tuple(sorted((row["source"], row["target"])))
+        return score_totals[pair] / occurrence_totals[pair]
+
+    result["Sentiment Strength"] = result.apply(
+        average_pair_score,
+        axis=1,
+    )
 
     result["Polarity"] = np.where(
         result["Sentiment Strength"] < -0.33,
@@ -235,12 +263,13 @@ def _prepare_review_data(
         for sentence in sent_tokenize(str(review)):
             sentence_rows.append({
                 "RevID": review_id,
+                "OriginalText": sentence,
                 "BaseText": text_preprocess(sentence),
             })
 
     sentences = pd.DataFrame(
         sentence_rows,
-        columns=["RevID", "BaseText"],
+        columns=["RevID", "OriginalText", "BaseText"],
     )
 
     # Get words
@@ -394,7 +423,11 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
     df_word_pairs = pd.DataFrame([{'source': pair[0], 'target': pair[1], 'weight': count} for pair, count in word_pairs_at_distance])
 
     # Add sentiment scores and select the most frequent pairs.
-    df_word_pairs = _add_pair_sentiment(df_word_pairs)
+    df_word_pairs = _add_pair_sentiment(
+        word_pairs=df_word_pairs,
+        sentences=sentences,
+        max_distance=2,
+    )
     df_word_pairs = df_word_pairs.head(50)
 
     return _build_chord_plot(
