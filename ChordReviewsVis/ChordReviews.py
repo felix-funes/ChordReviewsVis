@@ -136,87 +136,15 @@ def _build_chord_plot(
         )
     )
 
-def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False, lemmatization=True, words_to_replace={}, label_text_font_size=12, min_pair_frequency=100):
-    """
-    Process reviews data, apply text preprocessing, and generate a chord plot visualization showing word co-occurrence patterns and sentiment analysis.
-
-    Args:
-    df (pandas.DataFrame): DataFrame containing review data.
-    text_column (str): Name of the column containing the text data.
-    size (int, optional): Size of the output chord plot (default is 300).
-    stopwords_to_add (list, optional): Additional stopwords to be included in the stop words set (default is []).
-    stemming (bool, optional): Whether to apply stemming (default is False).
-        Cannot be enabled together with lemmatization.
-    lemmatization (bool, optional): Whether to apply lemmatization
-        (default is True). Cannot be enabled together with stemming.
-    words_to_replace (dict, optional): Complete-word replacements applied after
-        text normalization, in dictionary order. Keys are case-sensitive and
-        should match the normalized text (default is {}).
-    label_text_font_size (int, optional): Font size for the labels in the chord plot (default is 12).
-    min_pair_frequency (int, optional): Minimum number of counted occurrences
-        required for a word pair to appear in the chord plot. Must be a positive
-        integer; booleans and floats are not accepted. Use lower thresholds for
-        smaller datasets (default is 100).
-
-    Returns:
-    hv.Chord: Chord plot visualization.
-
-    Raises:
-    TypeError: If min_pair_frequency is not an integer or is a boolean.
-    ValueError: If stemming and lemmatization are both enabled,
-        min_pair_frequency is less than 1, text_column is missing,
-        the input contains no rows, any review text is missing or blank,
-        or no word pairs meet min_pair_frequency.
-
-    Notes:
-    Errors propagate to the caller instead of being printed and returning None.
-    """
-    if stemming and lemmatization:
-        raise ValueError(
-            "stemming and lemmatization cannot both be enabled. "
-            "Set either stemming=False or lemmatization=False."
-        )
-
-    if isinstance(min_pair_frequency, bool) or not isinstance(
-        min_pair_frequency, int
-    ):
-        raise TypeError(
-            "min_pair_frequency must be a positive integer."
-        )
-
-    if min_pair_frequency < 1:
-        raise ValueError(
-            "min_pair_frequency must be a positive integer."
-        )
-
-    if text_column not in df.columns:
-        raise ValueError(
-            f"text_column '{text_column}' was not found in the input DataFrame. "
-            "Choose a column containing review text."
-        )
-
-    if len(df.index) == 0:
-        raise ValueError(
-            "The input DataFrame must contain at least one review."
-        )
-
-    review_text = df[text_column]
-
-    missing_text = review_text.isna()
-    blank_text = review_text.map(
-        lambda value: isinstance(value, str) and not value.strip()
-    )
-
-    invalid_text = missing_text | blank_text
-    invalid_count = int(invalid_text.sum())
-
-    if invalid_count > 0:
-        raise ValueError(
-            f"Column '{text_column}' contains {invalid_count} row(s) "
-            "with missing or blank review text. "
-            "Fill in or explicitly remove these rows before calling ChordReviews."
-        )
-
+def _prepare_review_data(
+    df,
+    text_column,
+    stopwords_to_add,
+    stemming,
+    lemmatization,
+    words_to_replace,
+):
+    """Prepare sentence-level text and scaled term frequencies."""
     # Text preprocessing function
     def text_preprocess(raw_text, remove_HTML=True, chars_to_remove=r'\?|\.|\!|\;|\.|\"|\,|\(|\)|\&|\:|\-|\\|\/|\[|\]|\{|\}|\=|\+|\*|\%|\$|\@|\#|\_|\`|\~|\>|\<|\^|\|', 
                         remove_numbers=True, remove_line_breaks=False, 
@@ -356,6 +284,98 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
         return ' '.join(filtered_words)
 
     sentences['FilteredText'] = sentences['WordsCleaned'].apply(filter_grammatical_words)
+    return sentences, df_fdist
+
+
+def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False, lemmatization=True, words_to_replace={}, label_text_font_size=12, min_pair_frequency=100):
+    """
+    Process reviews data, apply text preprocessing, and generate a chord plot visualization showing word co-occurrence patterns and sentiment analysis.
+
+    Args:
+    df (pandas.DataFrame): DataFrame containing review data.
+    text_column (str): Name of the column containing the text data.
+    size (int, optional): Size of the output chord plot (default is 300).
+    stopwords_to_add (list, optional): Additional stopwords to be included in the stop words set (default is []).
+    stemming (bool, optional): Whether to apply stemming (default is False).
+        Cannot be enabled together with lemmatization.
+    lemmatization (bool, optional): Whether to apply lemmatization
+        (default is True). Cannot be enabled together with stemming.
+    words_to_replace (dict, optional): Complete-word replacements applied after
+        text normalization, in dictionary order. Keys are case-sensitive and
+        should match the normalized text (default is {}).
+    label_text_font_size (int, optional): Font size for the labels in the chord plot (default is 12).
+    min_pair_frequency (int, optional): Minimum number of counted occurrences
+        required for a word pair to appear in the chord plot. Must be a positive
+        integer; booleans and floats are not accepted. Use lower thresholds for
+        smaller datasets (default is 100).
+
+    Returns:
+    hv.Chord: Chord plot visualization.
+
+    Raises:
+    TypeError: If min_pair_frequency is not an integer or is a boolean.
+    ValueError: If stemming and lemmatization are both enabled,
+        min_pair_frequency is less than 1, text_column is missing,
+        the input contains no rows, any review text is missing or blank,
+        or no word pairs meet min_pair_frequency.
+
+    Notes:
+    Errors propagate to the caller instead of being printed and returning None.
+    """
+    if stemming and lemmatization:
+        raise ValueError(
+            "stemming and lemmatization cannot both be enabled. "
+            "Set either stemming=False or lemmatization=False."
+        )
+
+    if isinstance(min_pair_frequency, bool) or not isinstance(
+        min_pair_frequency, int
+    ):
+        raise TypeError(
+            "min_pair_frequency must be a positive integer."
+        )
+
+    if min_pair_frequency < 1:
+        raise ValueError(
+            "min_pair_frequency must be a positive integer."
+        )
+
+    if text_column not in df.columns:
+        raise ValueError(
+            f"text_column '{text_column}' was not found in the input DataFrame. "
+            "Choose a column containing review text."
+        )
+
+    if len(df.index) == 0:
+        raise ValueError(
+            "The input DataFrame must contain at least one review."
+        )
+
+    review_text = df[text_column]
+
+    missing_text = review_text.isna()
+    blank_text = review_text.map(
+        lambda value: isinstance(value, str) and not value.strip()
+    )
+
+    invalid_text = missing_text | blank_text
+    invalid_count = int(invalid_text.sum())
+
+    if invalid_count > 0:
+        raise ValueError(
+            f"Column '{text_column}' contains {invalid_count} row(s) "
+            "with missing or blank review text. "
+            "Fill in or explicitly remove these rows before calling ChordReviews."
+        )
+
+    sentences, df_fdist = _prepare_review_data(
+        df=df,
+        text_column=text_column,
+        stopwords_to_add=stopwords_to_add,
+        stemming=stemming,
+        lemmatization=lemmatization,
+        words_to_replace=words_to_replace,
+    )
 
     # Include adjacent pairs and distance-two pairs after word filtering.
     word_pairs_at_distance = _count_word_pairs(
