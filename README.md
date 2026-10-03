@@ -175,7 +175,7 @@ Connection colours summarise VADER sentiment from the original sentences contain
 - **Sentiment context:** a sentence can express different opinions about different attributes, but all its pairs receive the same sentence score. VADER can still misinterpret sarcasm and domain-specific language.
 - **Filtered-word distance:** removing words changes which terms are adjacent or two positions apart. Co-occurrence is an exploratory signal, not proof of a meaningful relationship.
 - **Configuration:** mutable list/dictionary defaults remain a deferred maintenance improvement.
-- **Verification scope:** 24 automated tests cover selected validation, scaling, pair-extraction and sentiment-attribution behaviours. GitHub Actions installs the package and runs them on Ubuntu with Python 3.14. This does not establish compatibility with every environment, sentiment accuracy or usefulness to users.
+- **Verification scope:** 26 automated tests cover selected validation, normalization, scaling, pair-extraction and sentiment-attribution behaviours. GitHub Actions installs the package and runs them on Ubuntu with Python 3.14. This does not establish compatibility with every environment, sentiment accuracy or usefulness to users.
 
 </details>
 
