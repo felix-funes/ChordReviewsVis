@@ -204,8 +204,25 @@ def _prepare_review_data(
             
         if lemmatization:
             lemmatizer = WordNetLemmatizer()
-            # Tokenize the text into words, filter out non-alphanumeric words, and lemmatize each word
-            proc_text = ' '.join([lemmatizer.lemmatize(word) for word in word_tokenize(proc_text) if word.isalnum()])
+
+            # Translate grammatical tags into WordNet's role codes.
+            wordnet_roles = {
+                "J": "a",  # Adjective
+                "V": "v",  # Verb
+                "N": "n",  # Noun
+                "R": "r",  # Adverb
+            }
+
+            tagged_words = pos_tag(word_tokenize(proc_text))
+
+            proc_text = " ".join(
+                lemmatizer.lemmatize(
+                    word,
+                    pos=wordnet_roles.get(tag[0], "n"),
+                )
+                for word, tag in tagged_words
+                if word.isalnum()
+            )
 
         # Remove punctuation and other special characters
         if len(chars_to_remove) > 0:
@@ -327,7 +344,8 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
     stopwords_to_add (list, optional): Additional stopwords to be included in the stop words set (default is []).
     stemming (bool, optional): Whether to apply stemming (default is False).
         Cannot be enabled together with lemmatization.
-    lemmatization (bool, optional): Whether to apply lemmatization
+    lemmatization (bool, optional): Whether to apply lemmatization using
+        estimated grammatical roles
         (default is True). Cannot be enabled together with stemming.
     words_to_replace (dict, optional): Complete-word replacements applied after
         text normalization, in dictionary order. Keys are case-sensitive and
