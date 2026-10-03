@@ -59,6 +59,83 @@ def _count_word_pairs(texts, max_distance, threshold):
 
     return filtered_word_pairs_counter.most_common()
 
+def _add_pair_sentiment(word_pairs):
+    """Return word pairs with constructed-phrase sentiment and polarity."""
+    result = word_pairs.copy()
+    analyzer = SentimentIntensityAnalyzer()
+
+    def score_pair(row):
+        text = f"The {row['target']} is {row['source']}."
+        return analyzer.polarity_scores(text)["compound"]
+
+    result["Sentiment Strength"] = result.apply(score_pair, axis=1)
+
+    result["Polarity"] = np.where(
+        result["Sentiment Strength"] < -0.33,
+        "Negative",
+        np.where(
+            result["Sentiment Strength"] <= 0.33,
+            "Neutral",
+            "Positive",
+        ),
+    )
+
+    return result
+
+def _build_chord_plot(
+    word_pairs,
+    frequencies,
+    size,
+    label_text_font_size,
+):
+    """Build a chord chart from scored pairs and scaled term frequencies."""
+    gray_scale = {}
+
+    for value in range(101):
+        gray_value = int(((100 - value) / 100) * 255)
+        gray_scale[value] = "#{:02x}{:02x}{:02x}".format(
+            gray_value,
+            gray_value,
+            gray_value,
+        )
+
+    gray_scale["nan"] = "#000000"
+
+    color_map = (
+        frequencies["Frequency_Scaled"]
+        .map(gray_scale)
+        .dropna()
+        .to_dict()
+    )
+
+    hv.extension("matplotlib")
+    hv.output(fig="svg", size=size)
+
+    def rotate_label(plot, element):
+        for annotation in plot.handles["labels"]:
+            annotation.set_size(label_text_font_size)
+            angle = annotation.get_rotation()
+
+            if 90 < angle < 270:
+                annotation.set_rotation(180 + angle)
+                annotation.set_horizontalalignment("right")
+
+    return hv.Chord(word_pairs).opts(
+        opts.Chord(
+            edge_cmap={
+                "Negative": "#fe7f81",
+                "Neutral": "#93e0e6",
+                "Positive": "#c2ffc1",
+            },
+            edge_color="Polarity",
+            labels="index",
+            node_cmap=color_map,
+            node_color="index",
+            hooks=[rotate_label],
+            node_size=0,
+        )
+    )
+
 def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False, lemmatization=True, words_to_replace={}, label_text_font_size=12, min_pair_frequency=100):
     """
     Process reviews data, apply text preprocessing, and generate a chord plot visualization showing word co-occurrence patterns and sentiment analysis.
@@ -296,56 +373,13 @@ def ChordReviews(df, text_column, size=300, stopwords_to_add=[], stemming=False,
     # Convert to DataFrame
     df_word_pairs = pd.DataFrame([{'source': pair[0], 'target': pair[1], 'weight': count} for pair, count in word_pairs_at_distance])
 
-    # Sentiment analysis using VADER
-    sid = SentimentIntensityAnalyzer()
-    
-    def calculate_sentiment_strength(adj, noun):
-        text = f"The {noun} is {adj}."
-        scores = sid.polarity_scores(text)
-        return scores['compound']
-
-    # Add Sentiment Strength column to DataFrame
-    df_word_pairs['Sentiment Strength'] = df_word_pairs.apply(lambda row: calculate_sentiment_strength(row['source'], row['target']), axis=1)
-
-    # Binning data according to sentiment strength
-    df_word_pairs["Polarity"] = np.where(df_word_pairs["Sentiment Strength"] < -0.33, "Negative", 
-                                        np.where(df_word_pairs["Sentiment Strength"] <= 0.33, "Neutral", "Positive"))
-
-    # Select top 50 word pairs
+    # Add sentiment scores and select the most frequent pairs.
+    df_word_pairs = _add_pair_sentiment(df_word_pairs)
     df_word_pairs = df_word_pairs.head(50)
 
-    # Generate gray scale dictionary
-    def generate_gray_scale():
-        gray_scale_dict = {}
-        for i in range(101):
-            gray_value = int(((100 - i) / 100) * 255)  # Invert i to make higher numbers darker
-            hex_color = "#{:02x}{:02x}{:02x}".format(gray_value, gray_value, gray_value)
-            gray_scale_dict[i] = hex_color
-        gray_scale_dict['nan'] = '#000000'  # Black color for NaN values
-        return gray_scale_dict
-
-    # Generate the gray scale dictionary
-    gray_scale_dictionary = generate_gray_scale()
-
-    df_fdist['Color'] = df_fdist['Frequency_Scaled'].map(gray_scale_dictionary)
-
-    color_map = df_fdist['Color'].dropna().copy()
-    color_map = color_map.to_dict()
-
-    hv.extension('matplotlib')
-    hv.output(fig='svg', size=size)
-
-    def rotate_label(plot, element):    
-        labels = plot.handles["labels"]
-        for annotation in labels:        
-            annotation.set_size(label_text_font_size)  
-            angle = annotation.get_rotation()
-            if 90 < angle < 270:
-                annotation.set_rotation(180 + angle)
-                annotation.set_horizontalalignment("right")
-                    
-    chord_plot = hv.Chord(df_word_pairs).opts(
-        opts.Chord(edge_cmap={'Negative': '#fe7f81', 'Neutral': '#93e0e6', 'Positive': '#c2ffc1'}, edge_color='Polarity', 
-                labels='index', node_cmap=color_map, node_color='index', hooks=[rotate_label], node_size=0))
-    
-    return chord_plot
+    return _build_chord_plot(
+        word_pairs=df_word_pairs,
+        frequencies=df_fdist,
+        size=size,
+        label_text_font_size=label_text_font_size,
+    )
