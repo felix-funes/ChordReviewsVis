@@ -101,7 +101,7 @@ I took the project from problem definition through implementation and evaluation
 
 Several important decisions were product decisions rather than purely technical choices.
 
-| Decision | Product rationale | Trade-off |
+| Decision | Rationale | Trade-off |
 | --- | --- | --- |
 | **Build an exploratory tool rather than an automated insight generator** | Analysts should inspect and interpret evidence rather than receive unsupported conclusions from the system. | Requires more user involvement and analytical judgement. |
 | **Use chord diagrams rather than only frequency-based visualization** | Show which concepts occur together while also communicating frequency and sentiment. | Dense diagrams become harder to interpret as the number of relationships increases. |
@@ -111,9 +111,7 @@ Several important decisions were product decisions rather than purely technical 
 | **Make thresholds configurable** | Dataset sizes differ substantially, so a fixed threshold would not work equally well everywhere. | Users need to understand how the threshold affects the output. |
 | **Treat the visualization as a starting point for investigation** | Co-occurrence and lexical sentiment are signals, not proof of customer intent or business causality. | The tool cannot replace qualitative inspection of the original reviews. |
 
----
-
-# Analytical and technical decisions
+## Analytical and technical decisions
 
 The underlying analytical behaviour also required explicit trade-offs.
 
