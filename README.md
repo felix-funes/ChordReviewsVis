@@ -168,8 +168,6 @@ I would prioritise validating user value and increasing trust before expanding t
 | **3. Evaluate sentiment independently** | Build a labelled evaluation dataset for the relationships shown; compare contextual, aspect-based or LLM-assisted alternatives if needed. | Agreement with human judgements and documented failure patterns for the intended use case. |
 | **4. Improve interaction** | If user research demonstrates value, add controls for thresholds, vocabulary, filtering and configuration comparison. | Users can complete investigations with less friction while interpreting the output correctly. |
 
-These are proposed measures, not achieved results.
-
 ## Getting started
 
 ### Installation
