@@ -5,4 +5,4 @@
 __pycache__/
 
 # Generated Python package metadata
-*.egg-info/
+*.egg-info/.DS_Store
