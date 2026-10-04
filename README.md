@@ -190,7 +190,7 @@ See the [NLTK data installation guide](https://www.nltk.org/data.html) for resou
 
 ### A small example
 
-These **synthetic reviews** provide a quick demonstration. Save the code as `example.py` and run `python example.py`, or use a notebook with the same environment.
+Save the code as `example.py` and run `python example.py`, or use a notebook with the same environment.
 
 ```python
 import pandas as pd
