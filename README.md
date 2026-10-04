@@ -174,10 +174,10 @@ These are proposed measures, not achieved results.
 
 ### Installation
 
-Use a Python environment with pip and Git available:
+Install version 0.4.0 from GitHub using a Python environment with pip and Git available.
 
 ```bash
-python -m pip install "git+https://github.com/felix-funes/ChordReviewsVis.git@main"
+python -m pip install "git+https://github.com/felix-funes/ChordReviewsVis.git@v0.4.0"
 ```
 
 The package installs its declared Python dependencies. NLTK also requires language resources; download them once in the same environment:
