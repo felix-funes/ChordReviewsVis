@@ -5,4 +5,7 @@
 __pycache__/
 
 # Generated Python package metadata
-*.egg-info/.DS_Store
+*.egg-info/
+
+# Hidden macOS files
+.DS_store
